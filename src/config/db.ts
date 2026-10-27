@@ -1,20 +1,53 @@
-import { Sequelize } from 'sequelize';
+import {Sequelize} from 'sequelize-typescript';
+
 import dotenv from 'dotenv';
+
+import path from 'path';
 
 dotenv.config();
 
-const database = new Sequelize(process.env.DATABASE_URL as string, {
+
+
+// @ts-ignore
+
+const database = new Sequelize(process.env.DATABASE_URL as string,{
+
     dialect: 'postgres',
+
     logging: false,
-    dialectOptions: {}
+
+    dialectOptions: {},
+
+    define: {
+
+        timestamps: true,
+
+        underscored: true,
+
+        schema: process.env.DB_SCHEMA
+
+    },
+
+    models: [path.join(__dirname, '../models/*.ts')]
+
 });
 
-export const connecDB: () => Promise<void> = async (): Promise<void> => {
+
+
+export const connecDB = async () => {
+
     try {
+
         await database.authenticate();
-        await database.sync();
+
+        await database.sync({ alter: true });
+
         console.log('Database connected...');
+
     } catch (error) {
+
         console.error('Unable to connect to the database:', error);
+
     }
-};
+
+}
