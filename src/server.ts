@@ -1,9 +1,20 @@
-import dotenv from 'dotenv';
-dotenv.config();
+import express, { Express } from "express";
+import "dotenv/config";
+import { connecDB } from "./config/db";
+import budgetRouter from "./routes/budgetRouter";
+import path from "node:path";
 
-import express from "express";
+const app: Express = express();
 
-const app = express();
-app.use(express.json());
+// Inicializar base de datos
+connecDB().then(() => {
+    app.use(express.json());
+
+    // Middleware de la ruta de presupuestos
+    app.use("/api/budgets", budgetRouter);
+
+}).catch((error) => {
+    console.error("Error al iniciar:", error);
+});
 
 export default app;
