@@ -10,12 +10,12 @@ export class BudgetController {
             const filter = req.query.filter || '';
 
             const budgets = await Budget.findAll({
-                attributes: ['name', 'amount', 'createdAt', 'updatedAt'],
+                attributes: ['id_budget','name', 'amount', 'createdAt', 'updatedAt'],
                 order: [['createdAt', 'DESC']],
                 limit: 10,
                 where: {
                     name: {
-                        [Op.like]: `%%`
+                        [Op.like]: `%SENATI%`
                     },
                     amount: {
                         [Op.gt]: 50
@@ -29,9 +29,16 @@ export class BudgetController {
     }
 
     static getBudgetById = async (req: Request, res: Response): Promise<void> => {
+        const {id} = req.params;
         try {
             // Logic to get a specific budget by ID from the database
-            res.status(200).json({ message: "Budget retrieved successfully" });
+            // @ts-ignore
+            const budget = await Budget.findByPk(id);
+            if(!budget) {
+                res.status(404).json({ message: "Budget not found" });
+                return;
+            }
+            res.status(200).json({ message: "Budget retrieved successfully", data: budget });
         } catch (error) {
             res.status(500).json({ message: "Error retrieving budget", error });
         }
@@ -51,6 +58,14 @@ export class BudgetController {
     static updateBudget = async (req: Request, res: Response): Promise<void> => {
         try {
             // Logic to update an existing budget in the database
+            const {id} = req.params;
+            // @ts-ignore
+            const budget = await Budget.findByPk(id);
+            if(!budget) {
+                res.status(404).json({ message: "Budget not found" });
+                return;
+            }
+            await budget.update(req.body);
             res.status(200).json({ message: "Budget updated successfully" });
         } catch (error) {
             res.status(500).json({ message: "Error updating budget", error });
@@ -59,7 +74,14 @@ export class BudgetController {
 
     static deleteBudget = async (req: Request, res: Response): Promise<void> => {
         try {
-            // Logic to delete a budget from the database
+            const {id} = req.params;
+            // @ts-ignore
+            const budget = await Budget.findByPk(id);
+            if(!budget) {
+                res.status(404).json({ message: "Budget not found" });
+                return;
+            }
+            await budget.destroy();
             res.status(200).json({ message: "Budget deleted successfully" });
         } catch (error) {
             res.status(500).json({ message: "Error deleting budget", error });
