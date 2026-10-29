@@ -1,20 +1,24 @@
-import express, { Express } from "express";
+import express from "express";
 import "dotenv/config";
 import { connecDB } from "./config/db";
 import budgetRouter from "./routes/budgetRouter";
-import path from "node:path";
 
-const app: Express = express();
+const app = express();
 
-// Inicializar base de datos
-connecDB().then(() => {
-    app.use(express.json());
+// Middleware para procesar JSON (Obligatorio antes de las rutas)
+app.use(express.json());
 
-    // Middleware de la ruta de presupuestos
-    app.use("/api/budgets", budgetRouter);
+// Conectar a la base de datos de forma asíncrona
+async function connect() {
+    try {
+        await connecDB();
+    } catch (error) {
+        console.error("Error al conectar a la Base de Datos:", error);
+    }
+}
+connect();
 
-}).catch((error) => {
-    console.error("Error al iniciar:", error);
-});
+// Rutas
+app.use("/api/budgets", budgetRouter);
 
 export default app;
