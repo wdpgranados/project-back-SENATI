@@ -1,8 +1,9 @@
-import { Table, Column, DataType, Model, CreatedAt, UpdatedAt } from "sequelize-typescript";
+import {Table, Column, DataType, Model} from "sequelize-typescript";
 
 @Table({
-    tableName: "budget",
+    tableName: 'budgets',
     timestamps: true,
+    underscored: true,
 })
 class Budget extends Model {
 
@@ -12,31 +13,18 @@ class Budget extends Model {
         primaryKey: true,
         autoIncrement: true
     })
-    id_budget!: number;
+    declare id_budget: number;
 
     @Column({
         type: DataType.STRING(100),
         allowNull: false
     })
-    name!: string;
+    declare name: string;
 
     @Column({
         type: DataType.FLOAT,
         allowNull: false
     })
-    amount!: number;
-
-    @CreatedAt
-    @Column({
-        type: DataType.DATE
-    })
-    created_At!: Date;
-
-    @UpdatedAt
-    @Column({
-        type: DataType.DATE
-    })
-    updated_At!: Date;
+    declare amount: number;
 }
-
 export default Budget;
